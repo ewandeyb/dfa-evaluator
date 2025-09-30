@@ -37,7 +37,7 @@ func TestEvaluatorNormalize(t *testing.T) {
 	for _, tt := range tests {
 		testname := fmt.Sprintf("(%c,%c) : %v", tt.eval.AState, tt.eval.BState, tt.line)
 		t.Run(testname, func(t *testing.T) {
-			result, err := tt.eval.Normalize(tt.line)
+			result, err := tt.eval.normalize(tt.line)
 			if err != nil {
 				if !tt.wantError {
 					t.Fatalf("Evaluator.Normalize() unexpected error: %v", err)
@@ -150,5 +150,34 @@ func TestNewEvaluator(t *testing.T) {
 				t.Error("Dfa is nil")
 			}
 		})
+	}
+}
+
+func TestEvaluatorEvaluate(t *testing.T) {
+	evaluator, err := NewEvaluator(`a,b
++,A,B,A
+-,B,A,B`)
+	if err != nil {
+		t.Fatalf("NewEvaluator() unexpected error: %v", err)
+	}
+
+	// positive case
+	res, err := evaluator.Evaluate("babaa")
+	if err != nil {
+		t.Fatalf("Evaluate() unexpected error: %v", err)
+	}
+
+	if !res {
+		t.Errorf("%v should be true", res)
+	}
+
+	// negative case
+	res, err = evaluator.Evaluate("baba")
+	if err != nil {
+		t.Fatalf("Evaluate() unexpected error: %v", err)
+	}
+
+	if res {
+		t.Errorf("%v should be false", res)
 	}
 }

@@ -40,8 +40,8 @@ func NewEvaluator(input string) (*Evaluator, error) {
 	return evaluator, nil
 }
 
-// `Normalize` converts a string input into an array of 0 and 1 using `AState` and `BState`
-func (e *Evaluator) Normalize(line string) ([]uint, error) {
+// `normalize` converts a string input into an array of 0 and 1 using `AState` and `BState`
+func (e *Evaluator) normalize(line string) ([]uint, error) {
 	result := []uint{}
 
 	for _, c := range []byte(line) {
@@ -56,4 +56,31 @@ func (e *Evaluator) Normalize(line string) ([]uint, error) {
 	}
 
 	return result, nil
+}
+
+// Run a string through the evaluator's DFA.
+func (e *Evaluator) Evaluate(line string) (bool, error) {
+
+	// normalize the line first
+	input, err := e.normalize(line)
+	if err != nil {
+		return false, err
+	}
+
+	// walk the DFA using the input
+	for _, ch := range input {
+		err = e.Dfa.Move(ch)
+		if err != nil {
+			return false, err
+		}
+	}
+	// reset the Dfa at the end
+	defer func() { e.Dfa.CurrentState = e.Dfa.StartState }()
+
+	// verify that the last state is an end state
+	if e.Dfa.GetCurrentState().IsEnd {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
