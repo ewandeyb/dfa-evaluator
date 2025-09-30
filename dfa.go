@@ -34,7 +34,7 @@ func (dfa *DFA) Move(read uint) error {
 	}
 
 	if !dfa.GetCurrentState().IsValid {
-		return fmt.Errorf("Went to an invalid state.")
+		return fmt.Errorf("went to an invalid state.")
 	}
 
 	return nil
