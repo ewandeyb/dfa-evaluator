@@ -83,6 +83,7 @@ func NewDFA(in string) (*DFA, error) {
 				return nil, fmt.Errorf("multiple start states parsed")
 			}
 			state.IsStart = true
+			dfa.StartState = idx
 			isStartSet = true
 		case "-":
 			state.IsEnd = true
