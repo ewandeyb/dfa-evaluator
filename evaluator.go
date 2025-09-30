@@ -15,6 +15,7 @@ func NewEvaluator(input string) (*Evaluator, error) {
 	evaluator := &Evaluator{}
 
 	states_line, dfa_lines, found := strings.Cut(input, "\n")
+
 	if !found {
 		return nil, fmt.Errorf("no new line was found")
 	}

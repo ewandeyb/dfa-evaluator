@@ -10,14 +10,25 @@
       .then((filename) => {
         alert(filename);
       })
-      .catch(() => {});
+      .catch((err) => {
+        alert(err);
+      });
   }
 </script>
 
 <main>
-  <img alt="Wails logo" id="logo" src={logo} />
-  <div class="result" id="result">{resultText}</div>
-  <div class="input-box" id="input">
-    <button class="btn" on:click={loadDotDfa}>Load .dfa</button>
-  </div>
+  <button class="btn" on:click={loadDotDfa}>Load .dfa</button>
 </main>
+
+<style>
+  main {
+    display: flexbox;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn {
+    width: 60%;
+    height: 50%;
+  }
+</style>

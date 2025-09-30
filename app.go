@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -46,8 +47,8 @@ func (a *App) LoadDotDfa() (string, error) {
 		return "", err
 	}
 
-	content := string(bytes)
-	a.evaluator, err = NewEvaluator(content)
+	content := strings.ReplaceAll(string(bytes), "\r\n", "\n")
+	a.evaluator, err = NewEvaluator(strings.TrimSpace(content))
 	if err != nil {
 		return "", err
 	}
