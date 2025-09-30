@@ -60,6 +60,8 @@ func (e *Evaluator) normalize(line string) ([]uint, error) {
 
 // Run a string through the evaluator's DFA.
 func (e *Evaluator) Evaluate(line string) (bool, error) {
+	// make sure the DFA is at its start state
+	e.Dfa.CurrentState = e.Dfa.StartState
 
 	// normalize the line first
 	input, err := e.normalize(line)
@@ -74,8 +76,6 @@ func (e *Evaluator) Evaluate(line string) (bool, error) {
 			return false, err
 		}
 	}
-	// reset the Dfa at the end
-	defer func() { e.Dfa.CurrentState = e.Dfa.StartState }()
 
 	// verify that the last state is an end state
 	if e.Dfa.GetCurrentState().IsEnd {
