@@ -1,9 +1,5 @@
 <script lang="ts">
-  import logo from "./assets/images/logo-universal.png";
-  import { LoadDotDfa } from "../wailsjs/go/main/App.js";
-
-  let resultText: string = "Please enter your name below 👇";
-  let name: string;
+  import { LoadDotDfa, LoadDotIn, EvaluateInput } from "../wailsjs/go/main/App.js";
 
   function loadDotDfa(): void {
     LoadDotDfa()
@@ -14,10 +10,35 @@
         alert(err);
       });
   }
+
+  let inputLines: string[] = [];
+
+  function loadDotIn(): void {
+    LoadDotIn()
+      .then((ret) => {
+        alert(ret);
+        inputLines = ret;
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  }
+
+  function evaluateInput(): void {
+    EvaluateInput(inputLines)
+      .then((ret) => {
+        alert(ret);
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  }
 </script>
 
 <main>
   <button class="btn" on:click={loadDotDfa}>Load .dfa</button>
+  <button class="btn" on:click={loadDotIn}>Load .in</button>
+  <button class="btn" on:click={evaluateInput}>Evaluate Input</button>
 </main>
 
 <style>
