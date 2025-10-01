@@ -78,14 +78,14 @@ func NewDFA(in string) (*DFA, error) {
 
 		// identify the state type (start, end) ===================================
 		switch cols[colStateType] {
-		case "+":
+		case "-":
 			if isStartSet {
 				return nil, fmt.Errorf("multiple start states parsed")
 			}
 			state.IsStart = true
 			dfa.StartState = idx
 			isStartSet = true
-		case "-":
+		case "+":
 			state.IsEnd = true
 		}
 

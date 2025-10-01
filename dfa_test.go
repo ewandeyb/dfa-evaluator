@@ -6,8 +6,8 @@ import (
 )
 
 func TestNewDFA_ValidInput(t *testing.T) {
-	input := `+,A,B,C
--,B,A,C
+	input := `-,A,B,C
++,B,A,C
 ,C,A,B`
 
 	dfa, err := NewDFA(input)
@@ -57,33 +57,33 @@ func TestNewDFA_Errors(t *testing.T) {
 	}{
 		{
 			name:   "Multiple start states",
-			input:  "+,A,B,C\n+,B,A,C",
+			input:  "-,A,B,C\n-,B,A,C",
 			errMsg: "multiple start states parsed",
 		},
 		{
 			name:   "Wrong number of columns",
-			input:  "+,A,B",
-			errMsg: "1:[+ A B] does not have 4 columns",
+			input:  "-,A,B",
+			errMsg: "1:[- A B] does not have 4 columns",
 		},
 		{
 			name:   "Invalid state name",
-			input:  "+,a,B,C",
+			input:  "-,a,B,C",
 			errMsg: "invalid state name `a`",
 		},
 		{
 			name:   "Invalid NextA state",
-			input:  "+,A,5,C",
+			input:  "-,A,5,C",
 			errMsg: "invalid state name `5`",
 		},
 		{
 			name:   "Invalid NextB state",
-			input:  "+,A,B,@",
+			input:  "-,A,B,@",
 			errMsg: "invalid state name `@`",
 		},
 		{
 			name:   "Too many columns",
-			input:  "+,A,B,C,D",
-			errMsg: "1:[+ A B C D] does not have 4 columns",
+			input:  "-,A,B,C,D",
+			errMsg: "1:[- A B C D] does not have 4 columns",
 		},
 	}
 
@@ -102,8 +102,8 @@ func TestNewDFA_Errors(t *testing.T) {
 }
 
 func TestDFA_Move(t *testing.T) {
-	input := `+,A,B,C
--,B,A,C
+	input := `-,A,B,C
++,B,A,C
 ,C,A,B`
 
 	dfa, err := NewDFA(input)
@@ -134,7 +134,7 @@ func TestDFA_Move(t *testing.T) {
 }
 
 func TestDFA_MoveToInvalidState(t *testing.T) {
-	input := `+,A,B,D`
+	input := `-,A,B,D`
 
 	dfa, err := NewDFA(input)
 	if err != nil {
@@ -152,9 +152,9 @@ func TestDFA_MoveToInvalidState(t *testing.T) {
 
 func TestDFA_MoveSequence(t *testing.T) {
 	// Create a simple DFA that accepts binary strings ending in 01
-	input := `+,A,A,B
+	input := `-,A,A,B
 ,B,C,B
--,C,C,B`
++,C,C,B`
 
 	dfa, err := NewDFA(input)
 	if err != nil {
@@ -205,7 +205,7 @@ func TestDFA_MoveSequence(t *testing.T) {
 
 func TestDFA_EdgeCases(t *testing.T) {
 	t.Run("Single state DFA", func(t *testing.T) {
-		input := `+,A,A,A`
+		input := `-,A,A,A`
 		dfa, err := NewDFA(input)
 		if err != nil {
 			t.Fatalf("NewDFA() unexpected error: %v", err)
@@ -223,7 +223,7 @@ func TestDFA_EdgeCases(t *testing.T) {
 	})
 
 	t.Run("State Z (last valid state)", func(t *testing.T) {
-		input := `+,Z,A,B`
+		input := `-,Z,A,B`
 		dfa, err := NewDFA(input)
 		if err != nil {
 			t.Fatalf("NewDFA() unexpected error: %v", err)
