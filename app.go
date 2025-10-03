@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -57,4 +58,54 @@ func (a *App) LoadDotDfa() (string, error) {
 	}
 
 	return content, nil
+}
+
+func (a *App) LoadDotIn() ([]string, error) {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return []string{}, err
+	}
+
+	// load file path
+	filename, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title:            "Select `.in` File",
+		DefaultDirectory: currentDir,
+		Filters: []runtime.FileFilter{
+			{DisplayName: "Input File (*.in)", Pattern: "*.in"},
+		},
+	})
+	if err != nil {
+		return []string{}, err
+	}
+
+	// load file into memory
+	bytes, err := os.ReadFile(filename)
+	if err != nil {
+		return []string{}, err
+	}
+
+	// trim whitespace
+	content := strings.ReplaceAll(string(bytes), "\r\n", "\n")
+	inputLines := strings.Split(strings.TrimSpace(content), "\n")
+	
+
+	return inputLines, nil
+}
+
+func (a *App) EvaluateInput(inputLines []string) ([]bool, error) {
+	if a.evaluator == nil {
+		return []bool{}, fmt.Errorf("no DFA loaded")
+	}
+
+	results := make([]bool, len(inputLines))
+	for i, line := range inputLines {
+		accepted, err := a.evaluator.Evaluate(line)
+		if err != nil {
+			return []bool{}, err
+		}
+
+		results[i] = accepted
+	}
+
+	return results, nil
 }
