@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LoadDotDfa, LoadDotIn, EvaluateInput } from "../wailsjs/go/main/App.js";
+  import { LoadDotDfa, LoadDotIn, EvaluateInput, SaveOutput } from "../wailsjs/go/main/App.js";
 
   let dfaContent: string = "";
   let dfaFilename: string = "";
@@ -53,12 +53,22 @@
   async function processInput(): Promise<void> {
     if (!canProcess) return;
 
+    let results: boolean[] = [];
+
     try {
-      const results = await EvaluateInput(inputLines);
+      results = await EvaluateInput(inputLines);
       outputResults = results;
-      statusMessage = `Input from ${inputFilename} successfully processed using DFA table from ${dfaFilename}. Output saved to ${inputFilename.replace('.in', '.out')}.`;
+
     } catch (err) {
       statusMessage = `Error processing input: ${err}`;
+    }
+
+    // Save the output to file
+    try {
+      await SaveOutput(results);
+      statusMessage = `Input from ${inputFilename} successfully processed using DFA table from ${dfaFilename}. Output saved to ${inputFilename.replace('.in', '.out')}.`;
+    } catch (saveErr) {
+      statusMessage = `Input processed successfully, but failed to save output: ${saveErr}`;
     }
   }
 

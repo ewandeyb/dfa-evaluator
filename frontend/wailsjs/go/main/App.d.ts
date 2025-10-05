@@ -7,3 +7,5 @@ export function EvaluateInput(arg1:Array<string>):Promise<Array<boolean>>;
 export function LoadDotDfa():Promise<main.DfaLoadResult>;
 
 export function LoadDotIn():Promise<main.InLoadResult>;
+
+export function SaveOutput(arg1:Array<boolean>):Promise<void>;

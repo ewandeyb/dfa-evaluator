@@ -12,8 +12,9 @@ import (
 
 // App struct
 type App struct {
-	ctx       context.Context
-	evaluator *Evaluator
+	ctx         context.Context
+	evaluator   *Evaluator
+	inputPath   string
 }
 
 // NewApp creates a new App application struct
@@ -102,6 +103,9 @@ func (a *App) LoadDotIn() (*InLoadResult, error) {
 	content := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 	inputLines := strings.Split(strings.TrimSpace(content), "\n")
 
+	// Store the full path for later saving
+	a.inputPath = filename
+
 	return &InLoadResult{
 		Filename:   filepath.Base(filename),
 		InputLines: inputLines,
@@ -124,4 +128,31 @@ func (a *App) EvaluateInput(inputLines []string) ([]bool, error) {
 	}
 
 	return results, nil
+}
+
+func (a *App) SaveOutput(results []bool) error {
+	if a.inputPath == "" {
+		return fmt.Errorf("no input file loaded")
+	}
+
+	// Generate output path by replacing .in extension with .out
+	outputPath := strings.TrimSuffix(a.inputPath, filepath.Ext(a.inputPath)) + ".out"
+
+	// Build output content
+	var output strings.Builder
+	for _, result := range results {
+		if result {
+			output.WriteString("VALID\n")
+		} else {
+			output.WriteString("INVALID\n")
+		}
+	}
+
+	// Write to file
+	err := os.WriteFile(outputPath, []byte(output.String()), 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -13,3 +13,7 @@ export function LoadDotDfa() {
 export function LoadDotIn() {
   return window['go']['main']['App']['LoadDotIn']();
 }
+
+export function SaveOutput(arg1) {
+  return window['go']['main']['App']['SaveOutput'](arg1);
+}
