@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -11,8 +12,9 @@ import (
 
 // App struct
 type App struct {
-	ctx       context.Context
-	evaluator *Evaluator
+	ctx         context.Context
+	evaluator   *Evaluator
+	inputPath   string
 }
 
 // NewApp creates a new App application struct
@@ -26,10 +28,15 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) LoadDotDfa() (string, error) {
+type DfaLoadResult struct {
+	Filename string `json:"filename"`
+	Content  string `json:"content"`
+}
+
+func (a *App) LoadDotDfa() (*DfaLoadResult, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// load file path
@@ -41,29 +48,37 @@ func (a *App) LoadDotDfa() (string, error) {
 		},
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// load file into memory (should be fine since there can be at most 27 lines)
 	bytes, err := os.ReadFile(filename)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// trim whitespace
 	content := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 	a.evaluator, err = NewEvaluator(strings.TrimSpace(content))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return content, nil
+	return &DfaLoadResult{
+		Filename: filepath.Base(filename),
+		Content:  content,
+	}, nil
 }
 
-func (a *App) LoadDotIn() ([]string, error) {
+type InLoadResult struct {
+	Filename   string   `json:"filename"`
+	InputLines []string `json:"inputLines"`
+}
+
+func (a *App) LoadDotIn() (*InLoadResult, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	// load file path
@@ -75,21 +90,26 @@ func (a *App) LoadDotIn() ([]string, error) {
 		},
 	})
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	// load file into memory
 	bytes, err := os.ReadFile(filename)
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	// trim whitespace
 	content := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 	inputLines := strings.Split(strings.TrimSpace(content), "\n")
-	
 
-	return inputLines, nil
+	// Store the full path for later saving
+	a.inputPath = filename
+
+	return &InLoadResult{
+		Filename:   filepath.Base(filename),
+		InputLines: inputLines,
+	}, nil
 }
 
 func (a *App) EvaluateInput(inputLines []string) ([]bool, error) {
@@ -108,4 +128,31 @@ func (a *App) EvaluateInput(inputLines []string) ([]bool, error) {
 	}
 
 	return results, nil
+}
+
+func (a *App) SaveOutput(results []bool) error {
+	if a.inputPath == "" {
+		return fmt.Errorf("no input file loaded")
+	}
+
+	// Generate output path by replacing .in extension with .out
+	outputPath := strings.TrimSuffix(a.inputPath, filepath.Ext(a.inputPath)) + ".out"
+
+	// Build output content
+	var output strings.Builder
+	for _, result := range results {
+		if result {
+			output.WriteString("VALID\n")
+		} else {
+			output.WriteString("INVALID\n")
+		}
+	}
+
+	// Write to file
+	err := os.WriteFile(outputPath, []byte(output.String()), 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
