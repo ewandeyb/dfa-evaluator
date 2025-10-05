@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -26,10 +27,15 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) LoadDotDfa() (string, error) {
+type DfaLoadResult struct {
+	Filename string `json:"filename"`
+	Content  string `json:"content"`
+}
+
+func (a *App) LoadDotDfa() (*DfaLoadResult, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// load file path
@@ -41,29 +47,37 @@ func (a *App) LoadDotDfa() (string, error) {
 		},
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// load file into memory (should be fine since there can be at most 27 lines)
 	bytes, err := os.ReadFile(filename)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// trim whitespace
 	content := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 	a.evaluator, err = NewEvaluator(strings.TrimSpace(content))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return content, nil
+	return &DfaLoadResult{
+		Filename: filepath.Base(filename),
+		Content:  content,
+	}, nil
 }
 
-func (a *App) LoadDotIn() ([]string, error) {
+type InLoadResult struct {
+	Filename   string   `json:"filename"`
+	InputLines []string `json:"inputLines"`
+}
+
+func (a *App) LoadDotIn() (*InLoadResult, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	// load file path
@@ -75,21 +89,23 @@ func (a *App) LoadDotIn() ([]string, error) {
 		},
 	})
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	// load file into memory
 	bytes, err := os.ReadFile(filename)
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	// trim whitespace
 	content := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 	inputLines := strings.Split(strings.TrimSpace(content), "\n")
-	
 
-	return inputLines, nil
+	return &InLoadResult{
+		Filename:   filepath.Base(filename),
+		InputLines: inputLines,
+	}, nil
 }
 
 func (a *App) EvaluateInput(inputLines []string) ([]bool, error) {

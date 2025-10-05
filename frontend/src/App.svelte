@@ -20,20 +20,18 @@
   async function loadDfaFile(): Promise<void> {
     showFileTypeDialog = false;
     try {
-      const content = await LoadDotDfa();
-      if (!content) return; // User cancelled
+      const result = await LoadDotDfa();
+      if (!result) return; // User cancelled
 
-      dfaContent = content;
-      // Extract filename from path if needed, or use default
-      dfaFilename = "transitions.dfa";
+      dfaContent = result.content;
+      dfaFilename = result.filename;
       statusMessage = `DFA table from ${dfaFilename} has been successfully loaded.`;
       previousDfaFilename = dfaFilename;
     } catch (err) {
-      const filename = "transitions.dfa";
       if (previousDfaFilename) {
-        statusMessage = `Unable to load content from ${filename} due to invalid content. The program will be using the content from the most recently successfully loaded ${previousDfaFilename}.`;
+        statusMessage = `Unable to load DFA file due to invalid content. The program will be using the content from the most recently successfully loaded ${previousDfaFilename}.`;
       } else {
-        statusMessage = `Unable to load content from ${filename} due to invalid content.`;
+        statusMessage = `Unable to load DFA file due to invalid content.`;
       }
     }
   }
@@ -41,14 +39,14 @@
   async function loadInFile(): Promise<void> {
     showFileTypeDialog = false;
     try {
-      const lines = await LoadDotIn();
-      if (!lines || lines.length === 0) return; // User cancelled
+      const result = await LoadDotIn();
+      if (!result || result.inputLines.length === 0) return; // User cancelled
 
-      inputLines = lines;
-      inputFilename = "strings.in";
+      inputLines = result.inputLines;
+      inputFilename = result.filename;
       statusMessage = `Input from file ${inputFilename} has been successfully loaded.`;
     } catch (err) {
-      statusMessage = `Unable to load content from ${inputFilename} due to invalid content.`;
+      statusMessage = `Unable to load input file due to invalid content.`;
     }
   }
 
