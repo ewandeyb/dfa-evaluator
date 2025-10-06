@@ -1,16 +1,84 @@
-# README
+# DFA Evaluator
 
-## About
+A desktop application for evaluating strings against Deterministic Finite Automata (DFA) with a user-friendly graphical interface.
 
-This is the official Wails Svelte-TS template.
+## Prerequisites
 
-## Live Development
+- Go installed on your system
+- Follow platform-specific Wails installation: https://wails.io/docs/gettingstarted/installation
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+## Quick Start
 
-## Building
+**Run Built App**: Use the pre-built executable called ```dfa-evaluator.app``` in `build/bin/` directory
 
-To build a redistributable, production mode package, use `wails build`.
+
+**Development Mode**: Run `wails dev` for live development with hot reload
+
+**Building**: Run `wails build --platform` for production package depending on your OS
+
+## Key Features
+
+- Load DFA tables (`.dfa`) and input strings (`.in`)
+- Validate strings against DFA rules (VALID/INVALID)
+- Auto-generate output files (`.out`)
+- Interactive GUI with real-time feedback
+- Comprehensive error handling
+
+## How It Works
+
+1. Load DFA transition table and input strings
+2. Validate DFA format and completeness
+3. Process each string through the DFA
+4. Generate results in UI and output file
+
+## Input Files
+
+### DFA Files (`.dfa`)
+CSV format with:
+- **Line 1**: Two alphabet symbols (e.g., `0,1`)
+- **Other lines**: State transitions with 4 elements:
+  - Type: `-` (start), `+` (final), or blank
+  - Source state (A-Z)
+  - Destination for symbol 1
+  - Destination for symbol 2
+
+### Input Strings (`.in`)
+- One string per line
+- Uses alphabet symbols from DFA
+
+## Example
+
+**transitions.dfa**
+```
+0,1
+-,A,B,A
+,B,B,C
++,C,B,A
+```
+
+**strings.in**
+```
+110011
+0111110001
+```
+
+**strings.out** (generated)
+```
+INVALID
+VALID
+```
+
+## Usage
+
+1. Launch application
+2. Load DFA file (`.dfa`)
+3. Load input strings (`.in`)
+4. Click "Process" to evaluate
+5. View results and check generated `.out` file
+
+## Project Structure
+
+- `dfa.go` - DFA logic and validation
+- `evaluator.go` - String evaluation engine  
+- `app.go` - Wails application bridge
+- `frontend/` - Svelte UI components
