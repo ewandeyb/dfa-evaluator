@@ -1,11 +1,15 @@
 # DFA Evaluator
 
 A desktop application for evaluating strings against Deterministic Finite Automata (DFA) with a user-friendly graphical interface.
+## Demo
+
+https://github.com/user-attachments/assets/a5590a40-b8fa-4caa-8c1f-eb2fb5154f4d
 
 ## Prerequisites
 
-- Go installed on your system
 - Follow platform-specific Wails installation: https://wails.io/docs/gettingstarted/installation
+- Check that you have Go, npm and other OS specific files installed.
+- Verify the installations with `wails doctor`
 
 ## Quick Start
 
