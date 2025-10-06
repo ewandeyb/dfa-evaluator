@@ -9,12 +9,11 @@ A desktop application for evaluating strings against Deterministic Finite Automa
 
 ## Quick Start
 
-**Run Built App**: Use the pre-built executable called ```dfa-evaluator.app``` in `build/bin/` directory
-
-
 **Development Mode**: Run `wails dev` for live development with hot reload
 
-**Building**: Run `wails build --platform` for production package depending on your OS
+**Building**: Run `wails build` for production package which is dependent on your OS.
+
+**Run Built App**: After building use the executable called ```dfa-evaluator.app``` in `build/bin/` directory
 
 ## Key Features
 
